@@ -11,7 +11,7 @@ export default function WelcomePage() {
 
   return (
     <div className="relative h-screen w-screen bg-black">
-      <Link href="/login" className="absolute top-6 right-6 text-white text-lg z-20" >Login</Link>
+      <Link href="/login" className="absolute top-6 right-6 text-white text-lg z-20 py-2 px-4 rounded-sm bg-slate-800 hover:bg-slate-900 transition duration-300" >Login</Link>
       <div className="absolute inset-0 z-0">
       <Image 
           src="/images/WelcomeScreenBackgroun.png"
