@@ -41,7 +41,7 @@ import { useRouter } from 'next/navigation';
       }
       const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
       if (!passwordPattern.test(password)) {
-        setPasswordError("Invalid password. Please enter a valid password");
+        setPasswordError("Wrong password. Please try again");
         isValid = false;
       }
 
