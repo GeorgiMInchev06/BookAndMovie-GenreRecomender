@@ -17,7 +17,7 @@ export default function HomePage() {
   console.log({user})
 
   // if (!user){
-  //   return router.push('/register')
+  //   return router.push('/')
   // }
 
   return (
