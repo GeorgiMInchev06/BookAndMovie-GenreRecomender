@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { ChevronsUpDown} from "lucide-react"
+import { useRouter, usePathname } from 'next/navigation';
 
 import {
   DropdownMenu,
@@ -22,7 +23,29 @@ export function Switcher({
   choices
 }) {
   const { isMobile } = useSidebar()
-  const [activeChoice, setActiveChoice] = React.useState(choices[0])
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Determine the initial active choice based on the current route
+  const initialChoice = React.useMemo(() => {
+    return (
+      choices.find((choice) => pathname === choice.path) || // Exact path match
+      choices.find((choice) => pathname.startsWith(choice.path)) || // Nested route match
+      choices[0] // Fallback to the first choice
+    );
+  }, [pathname, choices]);
+
+  const [activeChoice, setActiveChoice] = React.useState(initialChoice);
+
+  // Sync the active choice with the route
+  React.useEffect(() => {
+    setActiveChoice(initialChoice);
+  }, [initialChoice]);
+
+  const handleChoiceChange = (choice) => {
+    setActiveChoice(choice);
+    router.push(choice.path); // Navigate to the selected path
+  };
 
   return (
     (<SidebarMenu>
@@ -51,10 +74,12 @@ export function Switcher({
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}>
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Chose
+              Choose
             </DropdownMenuLabel>
             {choices.map((choice, index) => (
-              <DropdownMenuItem key={choice.name} onClick={() => setActiveChoice(choice)} className="gap-2 p-2">
+              <DropdownMenuItem 
+                key={choice.name} 
+                onClick={() => handleChoiceChange(choice)} className="gap-2 p-2">
                 <div className="flex size-6 items-center justify-center rounded-sm border">
                   <choice.logo className="size-4 shrink-0" />
                 </div>

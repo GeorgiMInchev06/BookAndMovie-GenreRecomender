@@ -38,11 +38,13 @@ const data = {
       name: "Movies",
       logo: Clapperboard,
       plan: "Find the best movies for you",
+      path: "movies"
     },
     {
       name: "Books",
       logo: LibraryBig,
       plan: "Find the best books for you",
+      path: "books"
     },
   ],
   navMain: [
