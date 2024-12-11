@@ -80,7 +80,9 @@ export function NavUser({
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Save />
+                <a href="/home/favourites">
                 Saved Movies & Books
+                </a>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
