@@ -30,29 +30,34 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
+import { SignedIn, SignOutButton, UserButton,  useUser,  } from '@clerk/nextjs';
+
 export function NavUser({
-  user
 }) {
   const { isMobile } = useSidebar()
+  const { user } = useUser();
 
   return (
     (<SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
+          <SignedIn>
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">SS</AvatarFallback>
+              <Avatar className="h-7 w-7 rounded-lg">
+              <SignedIn>
+                    <UserButton/>
+              </SignedIn>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+              <div>
+                <p className="truncate font-semibold">{user?.fullName}</p>
+                <p className="truncate text-xs">{user?.emailAddresses[0]?.emailAddress}</p>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
+            </SignedIn>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
@@ -62,33 +67,26 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">SS</AvatarFallback>
+                  {user?.imageUrl && (
+                    <img
+                    src={user.imageUrl}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                    )}
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <p className="truncate font-semibold">{user?.fullName}</p>
+                  <p className="truncate text-xs">{user?.emailAddresses[0]?.emailAddress}</p>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                <a href="/home/profile">
-                Account
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Save />
-                <a href="/home/favourites">
-                Saved Movies & Books
-                </a>
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut />
-              <a onClick={() => signOut(auth)}>Log out</a>
+              <SignOutButton/>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
