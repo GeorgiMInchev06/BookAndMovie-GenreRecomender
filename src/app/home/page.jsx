@@ -8,21 +8,24 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import {auth} from '@/app/firebase/config'
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
+import { SignedIn, SignedOut, UserButton, useAuth} from '@clerk/nextjs';
 
 export default function HomePage() {
 
-  const[user] = useAuthState(auth);
+  const { isSignedIn } = useAuth();
   const router = useRouter()
 
-  console.log({user})
+  // console.log({user})
 
-  // if (!user){
-  //   return router.push('/')
-  // }
+  if (!isSignedIn) {
+    router.push('/');
+    return null;
+  }
 
   return (
     <div className="relative h-screen w-screen bg-black">
-        <Button className="absolute top-6 left-6 text-white bg-slate-700 text-lg z-20" onClick={() => signOut(auth)}>Log out</Button>
+      
+        {/* <Button className="absolute top-6 left-6 text-white bg-slate-700 text-lg z-20" onClick={() => signOut(auth)}>Log out</Button> */}
       <div className="absolute inset-0 z-0">
         <Image 
             src="/images/WelcomeScreenBackgroun.png"
