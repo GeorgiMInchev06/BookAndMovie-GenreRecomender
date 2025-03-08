@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { SignedIn, SignOutButton, UserButton,  useUser,  } from '@clerk/nextjs';
+import Image from "next/image"
 
 export function NavUser({
 }) {
@@ -68,7 +69,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   {user?.imageUrl && (
-                    <img
+                    <Image
                     src={user.imageUrl}
                     alt="Profile"
                     className="w-8 h-8 rounded-full object-cover"
