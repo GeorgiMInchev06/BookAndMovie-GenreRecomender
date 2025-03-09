@@ -4,10 +4,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import {auth} from '@/app/firebase/config'
 import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth';
 import { SignedIn, SignedOut, UserButton, useAuth} from '@clerk/nextjs';
 
 export default function HomePage() {
