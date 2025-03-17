@@ -25,6 +25,10 @@ const favMoviesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  trailer: {
+    type: String,
+    required: true,
+  },
 });
 
 // const favBooksSchema = new mongoose.Schema({
