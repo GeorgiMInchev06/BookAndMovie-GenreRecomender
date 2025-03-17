@@ -28,7 +28,7 @@ export default function Layout({ children }) {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
+                  <BreadcrumbLink href="/home/movies">
                     Movies
                   </BreadcrumbLink>
                 </BreadcrumbItem>
