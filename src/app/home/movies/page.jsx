@@ -1,4 +1,3 @@
-import React from 'react'
 import Results from '@/components/Results';
 const MOVIES_API_KEY = process.env.MOVIES_API_KEY;
 
