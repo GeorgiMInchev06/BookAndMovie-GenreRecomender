@@ -84,7 +84,7 @@ export default async function MoviePage({ params }) {
           <p className='mr-10'>
             <span className="font-semibold">Duration:</span> {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
           </p>
-          <p className='mb-2 mr-96'>
+          <p className='mb-2 mr-auto'>
             <span className='font-semibold mr-1'>Rating:</span>
             {movie.vote_count}
           </p>
