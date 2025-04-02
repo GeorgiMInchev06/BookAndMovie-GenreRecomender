@@ -16,7 +16,9 @@ export default function SearchBox() {
 
   return (
     <form
-      className="flex items-center justify-between max-w-2xl mx-auto bg-white rounded-full shadow-md border border-gray-300 px-4 py-2"
+      className={`flex items-center justify-between max-w-2xl mx-auto bg-white rounded-full border border-gray-300 px-4 py-2 transition-shadow duration-200 
+        ${search ? 'shadow-lg' : 'shadow-md'} 
+        hover:shadow-xl`}
       onSubmit={handleSubmit}
     >
       <input

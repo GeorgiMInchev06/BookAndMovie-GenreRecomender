@@ -1,6 +1,8 @@
 import AddToFav from '@/components/AddToFav';
 import Link from 'next/link';
 import Image from 'next/image';
+import { currentUser } from '@clerk/nextjs/server';
+
 
 export default async function MoviePage({ params }) {
   const { id: movieId } = await params;
@@ -46,6 +48,25 @@ export default async function MoviePage({ params }) {
       </div>
     );
   }
+
+  const user = await currentUser();
+
+let isFav = false;
+
+if (user) {
+  const favRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user/getFav`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (favRes.ok) {
+    const { favs } = await favRes.json();
+    isFav = favs.some(fav => fav.movieId === movieId.toString());
+  }
+}
+
 
   return (
     <div className='w-full'>
@@ -95,9 +116,24 @@ export default async function MoviePage({ params }) {
             overview={movie.overview}
             releaseDate={movie.release_date || movie.first_air_date}
             voteCount={movie.vote_count}
+            duration={`${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`}
+            genres={movie.genres.map(g => g.name).join(', ')}
+            productionCompanies={movie.production_companies.map(p => p.name).join(', ')}
+            languages={movie.spoken_languages.map(l => l.english_name).join(', ')}
+            cast={cast.map(actor => ({
+              name: actor.name,
+              character: actor.character,
+              image: actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : null
+            }))}
+            trailer={trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null}
+            recommendations={recommendations.results.slice(0, 5).map(rec => ({
+              movieId: rec.id,
+              title: rec.title || rec.name,
+              image: rec.backdrop_path ? `https://image.tmdb.org/t/p/w500${rec.backdrop_path}` : null
+            }))}
+            isFav={isFav}
           />
           </div>
-         
         </div>
       </div>
       {trailer ? (
