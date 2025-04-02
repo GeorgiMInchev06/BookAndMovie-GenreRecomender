@@ -44,7 +44,7 @@ export function Switcher({
 
   const handleChoiceChange = (choice) => {
     setActiveChoice(choice);
-    router.push(choice.path); // Navigate to the selected path
+    router.push(`${choice.path}`); // Navigate to the selected path
   };
 
   return (

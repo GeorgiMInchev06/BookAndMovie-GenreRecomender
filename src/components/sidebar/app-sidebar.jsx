@@ -3,6 +3,7 @@
 import * as React from "react"
 import {
   Clapperboard,
+  Star,
   BookOpen,
   MessageCircleWarning,
   LibraryBig,
@@ -28,24 +29,26 @@ import {
 
 // This is sample data.
 const data = {
-  user: {
-    name: "Stanimir Stoilov",
-    email: "st.stoilov1312@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   choices: [
     {
       name: "Movies",
       logo: Clapperboard,
       plan: "Find the best movies for you",
-      path: "movies"
+      path: "/home/movies"
     },
     {
       name: "Books",
       logo: LibraryBig,
       plan: "Find the best books for you",
-      path: "books"
+      path: "/home/books"
     },
+    {
+      name: "Favorites",
+      path: "/home/favorites",
+      logo: Star,
+      plan: "Saved"
+    }
+    
   ],
   navMain: [
     {
