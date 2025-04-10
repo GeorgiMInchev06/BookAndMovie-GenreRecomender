@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import {
   Clapperboard,
   Star,
@@ -116,7 +117,10 @@ export function AppSidebar(props) {
         <Switcher choices={data.choices} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        {/* ✅ Suspense boundary for client-side hooks */}
+        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading filters...</div>}>
+          <NavMain items={data.navMain} />
+        </Suspense>
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
