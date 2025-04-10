@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams, usePathname } from "next/navigation";
 import { ChevronRight, Check, XCircle } from "lucide-react";
 
@@ -19,25 +20,39 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
-export function NavMain({ items, isActive }) {
+export function NavMain({ items }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  const clearAllFilters = () => {
-    window.location.href = pathname; // Reload with no filters
+  // 🔎 Match section title to query param name
+  const getParamKey = (title) => {
+    const map = {
+      Genre: "genre",
+      "Minimum Rating": "minRating",
+      Actor: "actor",
+      Rated: "certification",
+    };
+    return map[title] || "genre";
+  };
+
+  // ✅ Check if item is currently selected
+  const isActive = (sectionTitle, itemUrl) => {
+    const param = getParamKey(sectionTitle);
+    const value = new URL(itemUrl, "https://example.com").searchParams.get(param);
+    return searchParams.get(param) === value;
   };
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="flex justify-between items-center">
         Filters
-        <button
-          onClick={clearAllFilters}
+        <Link
+          href={pathname}
           className="text-sm text-red-600 hover:underline flex items-center gap-1"
         >
           <XCircle className="w-4 h-4" />
           Clear All
-        </button>
+        </Link>
       </SidebarGroupLabel>
 
       <SidebarMenu>
@@ -60,7 +75,7 @@ export function NavMain({ items, isActive }) {
               <CollapsibleContent>
                 <SidebarMenuSub>
                   {section.items?.map((item) => {
-                    const active = isActive?.(section.title, item.url);
+                    const active = isActive(section.title, item.url);
 
                     const param = new URL(item.url, "https://example.com")
                       .searchParams.entries()
@@ -70,11 +85,9 @@ export function NavMain({ items, isActive }) {
                     const updatedSearchParams = new URLSearchParams(searchParams.toString());
 
                     if (active) {
-                      // 🔄 Toggle OFF
-                      updatedSearchParams.delete(key);
+                      updatedSearchParams.delete(key); // 🔄 Toggle off
                     } else {
-                      // ✅ Set or merge
-                      updatedSearchParams.set(key, value);
+                      updatedSearchParams.set(key, value); // ✅ Add or update
                     }
 
                     const newUrl = `${pathname}?${updatedSearchParams.toString()}`;
@@ -89,7 +102,9 @@ export function NavMain({ items, isActive }) {
                             }`}
                           >
                             <span>{item.title}</span>
-                            {active && <Check className="w-4 h-4 text-green-500" />}
+                            {active && (
+                              <Check className="w-4 h-4 text-green-500 transition-opacity duration-200 opacity-100" />
+                            )}
                           </a>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
