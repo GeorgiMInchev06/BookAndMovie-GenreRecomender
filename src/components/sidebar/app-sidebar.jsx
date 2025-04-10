@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-import { useSearchParams } from "next/navigation";
 import {
   Clapperboard,
   Star,
@@ -22,22 +20,27 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// 🔍 Map section titles to query param keys
-function getParamKey(title) {
-  const map = {
-    Genre: "genre",
-    "Minimum Rating": "minRating",
-    Actor: "actor",
-    Rated: "certification",
-  };
-  return map[title] || "genre";
-}
-
+// Static filter config
 const data = {
   choices: [
-    { name: "Movies", logo: Clapperboard, plan: "Find the best movies for you", path: "/home/movies" },
-    { name: "Books", logo: LibraryBig, plan: "Find the best books for you", path: "/home/books" },
-    { name: "Favorites", logo: Star, path: "/home/favorites", plan: "Saved" },
+    {
+      name: "Movies",
+      logo: Clapperboard,
+      plan: "Find the best movies for you",
+      path: "/home/movies",
+    },
+    {
+      name: "Books",
+      logo: LibraryBig,
+      plan: "Find the best books for you",
+      path: "/home/books",
+    },
+    {
+      name: "Favorites",
+      path: "/home/favorites",
+      logo: Star,
+      plan: "Saved",
+    },
   ],
   navMain: [
     {
@@ -107,21 +110,13 @@ const data = {
 };
 
 export function AppSidebar(props) {
-  const searchParams = useSearchParams();
-
-  const isActive = (sectionTitle, itemUrl) => {
-    const param = getParamKey(sectionTitle);
-    const urlValue = new URL(itemUrl, "https://example.com").searchParams.get(param);
-    return searchParams.get(param) === urlValue;
-  };
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <Switcher choices={data.choices} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} isActive={isActive} />
+        <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
