@@ -79,7 +79,7 @@ export default async function MoviesPage({ searchParams }) {
         </div>
       )}
       
-      <Results results={results} />
+      <Results results={results} type="movie"/>
     </div>
   );
 }

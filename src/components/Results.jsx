@@ -1,12 +1,18 @@
-import React from 'react';
-import Card from './Card';
+'use client';
 
-export default function Results({results}) {
+import MoviesCard from './MoviesCard';
+import BooksCard from './BooksCard';
+
+export default function Results({ results, type = 'movie' }) {
   return (
-    <div className='sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 max-w-full mx-auto py-4'>
-        {results.map((result) => (
-            <Card key={result.id} result={result}/>
-        ))}
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-w-full mx-auto py-4">
+      {results.map((item) =>
+        type === 'book' ? (
+          <BooksCard key={item.id} book={item} />
+        ) : (
+          <MoviesCard key={item.id} result={item} />
+        )
+      )}
     </div>
-  )
+  );
 }

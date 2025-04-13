@@ -2,11 +2,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FiThumbsUp } from 'react-icons/fi';
 
-export default function Card({ result }) {
+export default function MoviesCard({ result }) {
   const imagePath = result.backdrop_path || result.poster_path;
   const imageUrl = imagePath
     ? `https://image.tmdb.org/t/p/original/${imagePath}`
-    : "/images/placeholder.png"; // fallback image (optional)
+    : "/images/no_image_available.jpg"; // fallback image
 
   return (
     <div className="group cursor-pointer sm:hover:shadow-slate-400 sm:shadow-md rounded-lg sm:border sm:border-slate-400 sm:m-2 transition-shadow duration-200">
