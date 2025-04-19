@@ -24,7 +24,7 @@ export default function BooksCard({ book }) {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="group cursor-pointer w-[200px] sm:w-[200px] h-[400px] bg-white dark:bg-gray-900 sm:hover:shadow-slate-400 sm:shadow-md rounded-lg sm:border sm:border-slate-400 sm:m-2 overflow-hidden"
     >
-      <Link href={`/home/books/book${book.key || ''}`} className="block h-full">
+      <Link href={`/home/books/book/${book.key.replace('/works/', '')}`} className="block h-full">
         <div className="relative w-full h-[270px]">
           <Image
             src={imageUrl}
