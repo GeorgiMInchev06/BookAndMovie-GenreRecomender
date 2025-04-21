@@ -9,12 +9,16 @@ export default function BooksCard({ book }) {
   if (!book || typeof book !== 'object') return null;
 
   const title = book.title || 'Untitled';
-  const author = book.author_name?.join(', ') || 'Unknown Author';
-  const year = book.first_publish_year || '—';
-  const coverId = book.cover_i;
+  const author = book.author_name?.join(', ') || book.author_name || 'Unknown Author';
+  const year = book.first_publish_year || book.publishYear || '—';
+  const coverId = book.cover_i || book.coverId;
   const imageUrl = coverId
     ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`
-    : '/images/no_image_available.jpg';
+    : book.image || '/images/no_image_available.jpg';
+
+  // 🔧 Fix: Always ensure clean ID
+  const rawKey = book.key || book.id || '';
+  const bookId = rawKey.replace('/works/', '');
 
   return (
     <motion.div
@@ -24,7 +28,7 @@ export default function BooksCard({ book }) {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="group cursor-pointer w-[200px] sm:w-[200px] h-[400px] bg-white dark:bg-gray-900 sm:hover:shadow-slate-400 sm:shadow-md rounded-lg sm:border sm:border-slate-400 sm:m-2 overflow-hidden"
     >
-      <Link href={`/home/books/book/${book.key.replace('/works/', '')}`} className="block h-full">
+      <Link href={`/home/books/book/${bookId}`} className="block h-full">
         <div className="relative w-full h-[270px]">
           <Image
             src={imageUrl}

@@ -14,7 +14,10 @@ export const PUT = async (req) => {
     if (!existingUser) {
       return new Response('User not found', { status: 404 });
     }
-    return new Response(JSON.stringify({ favs: existingUser.favs }), {
+    return new Response(JSON.stringify({
+       favs: existingUser.favs,
+       favBooks: existingUser.favBooks,
+      }), {
       status: 200,
     });
   } catch (error) {

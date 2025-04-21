@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
+import AddBookToFav from '@/components/AddBookToFav';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +12,8 @@ export default function BookDetailsPage({ params }) {
   const { id } = params;
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isFav, setIsFav] = useState(false);
+  const { isSignedIn, user, isLoaded } = useUser();
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -17,6 +21,20 @@ export default function BookDetailsPage({ params }) {
         const res = await fetch(`https://openlibrary.org/works/${id}.json`);
         if (!res.ok) throw new Error('Book not found');
         const data = await res.json();
+  
+        // Fetch author names
+        const authorNames = await Promise.all(
+          (data.authors || []).map(async (a) => {
+            const key = a.author?.key;
+            if (!key) return null;
+            const authorRes = await fetch(`https://openlibrary.org${key}.json`);
+            if (!authorRes.ok) return null;
+            const authorData = await authorRes.json();
+            return authorData.name;
+          })
+        );
+  
+        data.authorNames = authorNames.filter(Boolean); // remove nulls
         setBook(data);
       } catch (err) {
         setBook(null);
@@ -24,10 +42,25 @@ export default function BookDetailsPage({ params }) {
         setLoading(false);
       }
     };
+  
     fetchBook();
   }, [id]);
 
-  // 🌀 Loading State (Same as Movie Page)
+  // 🔁 Check if it's already in favorites
+  useEffect(() => {
+    const checkFavStatus = async () => {
+      if (isSignedIn && isLoaded) {
+        const res = await fetch('/api/user/getFav', { method: 'PUT' });
+        const data = await res.json();
+        const exists = data.favBooks.some((b) => b.bookId === `/works/${id}`);
+        setIsFav(exists);
+      }
+    };
+
+    checkFavStatus();
+  }, [id, isSignedIn, isLoaded]);
+
+  // 🌀 Loading
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
@@ -43,7 +76,7 @@ export default function BookDetailsPage({ params }) {
     );
   }
 
-  // ❌ Error / Not Found
+  // ❌ Not found
   if (!book || !book.title) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center animate-fade-in">
@@ -104,6 +137,19 @@ export default function BookDetailsPage({ params }) {
               </ul>
             </div>
           )}
+
+          {/* ⭐ Favorite button */}
+          <div className="mt-6">
+            <AddBookToFav
+              bookId={book.key}
+              title={title}
+              description={description}
+              image={imageUrl}
+              authors={book.authorNames || []}
+              publishYear={book.first_publish_date || '—'}
+              isFav={isFav}
+            />
+          </div>
 
           <Link
             href="/home/books"
