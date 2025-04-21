@@ -68,32 +68,32 @@ const favMoviesSchema = new mongoose.Schema({
   },
 });
 
-// const favBooksSchema = new mongoose.Schema({
-//     bookId: {
-//       type: String,
-//       required: true,
-//     },
-//     title: {
-//       type: String,
-//       required: true,
-//     },
-//     description: {
-//       type: String,
-//       required: true,
-//     },
-//     dateReleased: {
-//       type: Date,
-//       required: true,
-//     },
-//     rating: {
-//       type: Number,
-//       required: true,
-//     },
-//     image: {
-//       type: String,
-//       required: true,
-//     },
-//   });
+const favBooksSchema = new mongoose.Schema({
+  bookId: {
+    type: String,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  authors: {
+    type: [String],
+    required: true,
+  },
+  publishYear: {
+    type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+    required: true,
+  },
+});
 
 const userSchema = new mongoose.Schema(
   {
@@ -125,6 +125,10 @@ const userSchema = new mongoose.Schema(
     },
     favs: {
       type: [favMoviesSchema],
+      default: [],
+    },
+    favBooks: {
+      type: [favBooksSchema],
       default: [],
     },
   },
