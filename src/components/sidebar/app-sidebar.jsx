@@ -6,7 +6,9 @@ import {
   Star,
   MessageCircleWarning,
   LibraryBig,
-  UserRound,
+  CalendarIcon,
+  GlobeIcon,
+  ArrowDownUp,
   SquareTerminal,
 } from "lucide-react";
 
@@ -80,21 +82,34 @@ const data = {
       ],
     },
     {
-      title: "Actor",
-      icon: UserRound,
+      title: "Release Year",
+      icon: CalendarIcon, // Import from lucide-react
       items: [
-        { title: "Leonardo DiCaprio", url: "/home/movies?actor=Leonardo+DiCaprio" },
-        { title: "Robert De Niro", url: "/home/movies?actor=Robert+De+Niro" },
-        { title: "Scarlett Johansson", url: "/home/movies?actor=Scarlett+Johansson" },
-        { title: "Tom Hanks", url: "/home/movies?actor=Tom+Hanks" },
-        { title: "Ryan Gosling", url: "/home/movies?actor=Ryan+Gosling" },
-        { title: "Emma Stone", url: "/home/movies?actor=Emma+Stone" },
-        { title: "Denzel Washington", url: "/home/movies?actor=Denzel+Washington" },
-        { title: "Brad Pitt", url: "/home/movies?actor=Brad+Pitt" },
-        { title: "Johnny Depp", url: "/home/movies?actor=Johnny+Depp" },
-        { title: "Jennifer Lawrence", url: "/home/movies?actor=Jennifer+Lawrence" },
-        { title: "Christian Bale", url: "/home/movies?actor=Christian+Bale" },
-        { title: "Natalie Portman", url: "/home/movies?actor=Natalie+Portman" },
+        { title: "2024", url: "/home/movies?releaseYear=2024" },
+        { title: "2023", url: "/home/movies?releaseYear=2023" },
+        { title: "2022", url: "/home/movies?releaseYear=2022" },
+        { title: "2021", url: "/home/movies?releaseYear=2021" },
+        { title: "2020", url: "/home/movies?releaseYear=2020" },
+      ],
+    },
+    {
+      title: "Language",
+      icon: GlobeIcon, // Import from lucide-react
+      items: [
+        { title: "English", url: "/home/movies?language=en" },
+        { title: "Spanish", url: "/home/movies?language=es" },
+        { title: "French", url: "/home/movies?language=fr" },
+        { title: "German", url: "/home/movies?language=de" },
+        { title: "Japanese", url: "/home/movies?language=ja" },
+        { title: "Hindi", url: "/home/movies?language=hi" },
+      ],
+    },
+    {
+      title: "Sort By",
+      icon: ArrowDownUp, // Import from lucide-react
+      items: [
+        { title: "Most Popular", url: "/home/movies?sortBy=popularity.desc" },
+        { title: "Top Rated", url: "/home/movies?sortBy=vote_average.desc" },
       ],
     },
     {

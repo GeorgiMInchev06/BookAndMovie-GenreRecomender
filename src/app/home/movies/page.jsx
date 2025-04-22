@@ -4,30 +4,19 @@ import Link from 'next/link';
 const NEXT_PUBLIC_MOVIES_API_KEY = process.env.NEXT_PUBLIC_MOVIES_API_KEY;
 
 export default async function MoviesPage({ searchParams }) {
-  // Read filters from search params
-  const genre = searchParams.genre;
-  const minRating = searchParams.minRating;
-  const actorName = searchParams.actor;
-  const certification = searchParams.certification;
+  const {
+    genre,
+    minRating,
+    certification,
+    language,
+    releaseYear,
+    sortBy, // default if nothing is selected
+  } = searchParams;
 
-  let actorId = null;
-
-  // 🔍 Convert actor name → TMDB ID
-  if (actorName) {
-    const actorSearchRes = await fetch(
-      `https://api.themoviedb.org/3/search/person?api_key=${NEXT_PUBLIC_MOVIES_API_KEY}&query=${encodeURIComponent(actorName)}`
-    );
-    if (actorSearchRes.ok) {
-      const actorData = await actorSearchRes.json();
-      actorId = actorData.results?.[0]?.id;
-    }
-  }
-
-  // 🛠️ Build query for Discover API
   const queryParams = new URLSearchParams({
     api_key: NEXT_PUBLIC_MOVIES_API_KEY,
     language: 'en-US',
-    sort_by: 'popularity.desc',
+    sort_by: sortBy,
     include_adult: 'false',
     include_video: 'false',
     page: '1',
@@ -36,9 +25,16 @@ export default async function MoviesPage({ searchParams }) {
   if (genre) queryParams.append('with_genres', genre);
   if (minRating) queryParams.append('vote_average.gte', minRating);
   if (certification) queryParams.append('certification', certification);
-  if (actorId) queryParams.append('with_cast', actorId);
+  if (language) queryParams.append('with_original_language', language);
+  if (releaseYear) queryParams.append('primary_release_year', releaseYear);
+
+  // Special logic: If sorting by top rated, only show movies with high vote count
+  if (sortBy === 'vote_average.desc') {
+    queryParams.append('vote_count.gte', '1000');
+  }
 
   const url = `https://api.themoviedb.org/3/discover/movie?${queryParams.toString()}`;
+  // console.log('📡 TMDB API:', url); // debug
 
   const res = await fetch(url, { next: { revalidate: 10000 } });
 
@@ -49,12 +45,23 @@ export default async function MoviesPage({ searchParams }) {
   const data = await res.json();
   const results = data.results;
 
-  // 🎯 Prepare filter tags to show above results
+  // Build active filters for tag UI
   const activeFilters = [];
-  if (genre) activeFilters.push({ label: `🎬 ${genre}`, param: 'genre' });
+  if (genre) activeFilters.push({ label: `🎬 Genre: ${genre}`, param: 'genre' });
   if (minRating) activeFilters.push({ label: `⭐ ${minRating}+`, param: 'minRating' });
   if (certification) activeFilters.push({ label: `🔞 ${certification}`, param: 'certification' });
-  if (actorName) activeFilters.push({ label: `🧑 ${actorName}`, param: 'actor' });
+  if (language) activeFilters.push({ label: `🌐 ${language}`, param: 'language' });
+  if (releaseYear) activeFilters.push({ label: `📅 ${releaseYear}`, param: 'releaseYear' });
+  if (sortBy) {
+    const sortLabelMap = {
+      'popularity.desc': '🔥 Most Popular',
+      'vote_average.desc': '⭐ Top Rated',
+    };
+  
+    const label = sortLabelMap[sortBy] || `↕ Sort: ${sortBy}`;
+    activeFilters.push({ label, param: 'sortBy' });
+  }
+  
 
   const clearFiltersUrl = '/home/movies';
 
@@ -78,8 +85,8 @@ export default async function MoviesPage({ searchParams }) {
           </Link>
         </div>
       )}
-      
-      <Results results={results} type="movie"/>
+
+      <Results results={results} type="movie" />
     </div>
   );
 }

@@ -31,9 +31,13 @@ export function NavMain({ items }) {
       "Minimum Rating": "minRating",
       Actor: "actor",
       Rated: "certification",
+      "Release Year": "releaseYear",
+      Language: "language",
+      "Sort By": "sortBy",
     };
-    return map[title] || "genre";
+    return map[title] || "";
   };
+  
 
   // ✅ Check if item is currently selected
   const isActive = (sectionTitle, itemUrl) => {
