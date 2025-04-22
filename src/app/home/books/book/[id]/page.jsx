@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import AddBookToFav from '@/components/AddBookToFav';
+import ReactMarkdown from 'react-markdown';
 
 export const dynamic = 'force-dynamic';
 
@@ -101,7 +102,10 @@ export default function BookDetailsPage({ params }) {
 
   // 📖 Book Data
   const title = book.title;
-  const description = book.description?.value || book.description || 'No description available.';
+  const description =
+  typeof book.description === 'string'
+    ? book.description
+    : book.description?.value || 'No description available.';
   const subjects = book.subjects?.slice(0, 5) || [];
   const coverId = book.covers?.[0];
   const imageUrl = coverId
@@ -109,7 +113,7 @@ export default function BookDetailsPage({ params }) {
     : '/images/no_image_available.jpg';
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md w-full">
       <div className="flex flex-col md:flex-row gap-6">
         {/* Image */}
         <div className="relative w-full md:w-1/3 h-[500px] bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
@@ -125,8 +129,34 @@ export default function BookDetailsPage({ params }) {
         {/* Content */}
         <div className="flex-1">
           <h1 className="text-3xl font-bold mb-4">{title}</h1>
-          <p className="text-md text-gray-700 dark:text-gray-300 mb-4">{description}</p>
-
+          {book.authorNames?.length > 0 && (
+            <p className="text-sm text-muted-foreground mb-2">
+              By {book.authorNames.join(', ')}
+            </p>
+          )}
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => (
+                <p className="text-md text-gray-700 dark:text-gray-300 mb-4">{children}</p>
+              ),
+              a: ({ href, children }) => (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline hover:text-blue-800 transition"
+                >
+                  {children}
+                </a>
+              ),
+              li: ({ children }) => (
+                <li className="list-disc list-inside">{children}</li>
+              )
+            }}
+          >
+            {description}
+          </ReactMarkdown>
+          <div className='flex flex-row'>
           {subjects.length > 0 && (
             <div className="mt-4">
               <h3 className="font-semibold text-lg mb-2">Subjects:</h3>
@@ -137,9 +167,16 @@ export default function BookDetailsPage({ params }) {
               </ul>
             </div>
           )}
-
-          {/* ⭐ Favorite button */}
-          <div className="mt-6">
+          </div>
+          {/* <Link
+            href="/home/books"
+            className="inline-block mt-6 text-blue-600 hover:underline"
+          >
+            ← Back to Books
+          </Link> */}
+        </div>
+        {/* ⭐ Favorite button */}
+        <div className="mt-auto mr-auto">
             <AddBookToFav
               bookId={book.key}
               title={title}
@@ -150,14 +187,6 @@ export default function BookDetailsPage({ params }) {
               isFav={isFav}
             />
           </div>
-
-          <Link
-            href="/home/books"
-            className="inline-block mt-6 text-blue-600 hover:underline"
-          >
-            ← Back to Books
-          </Link>
-        </div>
       </div>
     </div>
   );
