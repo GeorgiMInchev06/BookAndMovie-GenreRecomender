@@ -22,6 +22,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import YearFilterSection from "@/components/sidebar/yearFilterSection"
 
 // Static filter config
 const data = {
@@ -84,13 +85,7 @@ const data = {
     {
       title: "Release Year",
       icon: CalendarIcon, // Import from lucide-react
-      items: [
-        { title: "2024", url: "/home/movies?releaseYear=2024" },
-        { title: "2023", url: "/home/movies?releaseYear=2023" },
-        { title: "2022", url: "/home/movies?releaseYear=2022" },
-        { title: "2021", url: "/home/movies?releaseYear=2021" },
-        { title: "2020", url: "/home/movies?releaseYear=2020" },
-      ],
+      component: <YearFilterSection />,
     },
     {
       title: "Language",

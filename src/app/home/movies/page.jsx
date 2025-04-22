@@ -9,14 +9,15 @@ export default async function MoviesPage({ searchParams }) {
     minRating,
     certification,
     language,
-    releaseYear,
-    sortBy, // default if nothing is selected
+    sortBy,
+    fromYear,
+    toYear,
   } = searchParams;
 
   const queryParams = new URLSearchParams({
     api_key: NEXT_PUBLIC_MOVIES_API_KEY,
     language: 'en-US',
-    sort_by: sortBy,
+    sort_by: sortBy || 'popularity.desc', // ✅ Default fallback
     include_adult: 'false',
     include_video: 'false',
     page: '1',
@@ -26,42 +27,44 @@ export default async function MoviesPage({ searchParams }) {
   if (minRating) queryParams.append('vote_average.gte', minRating);
   if (certification) queryParams.append('certification', certification);
   if (language) queryParams.append('with_original_language', language);
-  if (releaseYear) queryParams.append('primary_release_year', releaseYear);
 
-  // Special logic: If sorting by top rated, only show movies with high vote count
+  // 🎯 Apply year filters
+  if (fromYear) queryParams.append('primary_release_date.gte', `${fromYear}-01-01`);
+  if (toYear) queryParams.append('primary_release_date.lte', `${toYear}-12-31`);
+
+  // ⭐ If sorting by rating, require high vote count
   if (sortBy === 'vote_average.desc') {
     queryParams.append('vote_count.gte', '1000');
   }
 
   const url = `https://api.themoviedb.org/3/discover/movie?${queryParams.toString()}`;
-  // console.log('📡 TMDB API:', url); // debug
-
   const res = await fetch(url, { next: { revalidate: 10000 } });
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
+  if (!res.ok) throw new Error('Failed to fetch data');
 
   const data = await res.json();
   const results = data.results;
 
-  // Build active filters for tag UI
+  // 🎯 Active filter display
   const activeFilters = [];
+
   if (genre) activeFilters.push({ label: `🎬 Genre: ${genre}`, param: 'genre' });
   if (minRating) activeFilters.push({ label: `⭐ ${minRating}+`, param: 'minRating' });
   if (certification) activeFilters.push({ label: `🔞 ${certification}`, param: 'certification' });
   if (language) activeFilters.push({ label: `🌐 ${language}`, param: 'language' });
-  if (releaseYear) activeFilters.push({ label: `📅 ${releaseYear}`, param: 'releaseYear' });
+
+  if (fromYear || toYear) {
+    activeFilters.push({ label: `📅 ${fromYear || '—'} - ${toYear || '—'}`, param: 'fromYear' });
+  }
+
   if (sortBy) {
     const sortLabelMap = {
       'popularity.desc': '🔥 Most Popular',
       'vote_average.desc': '⭐ Top Rated',
     };
-  
     const label = sortLabelMap[sortBy] || `↕ Sort: ${sortBy}`;
     activeFilters.push({ label, param: 'sortBy' });
   }
-  
 
   const clearFiltersUrl = '/home/movies';
 

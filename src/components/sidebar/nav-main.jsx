@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useSearchParams, usePathname } from "next/navigation";
-import { ChevronRight, Check, XCircle } from "lucide-react";
+import Link from 'next/link';
+import { useSearchParams, usePathname } from 'next/navigation';
+import { ChevronRight, Check, XCircle } from 'lucide-react';
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from '@/components/ui/collapsible';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -18,31 +18,30 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
+
+import YearFilterSection from '@/components/sidebar/yearFilterSection'; // ⬅️ Импортирай тук твоя нов компонент
 
 export function NavMain({ items }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  // 🔎 Match section title to query param name
   const getParamKey = (title) => {
     const map = {
-      Genre: "genre",
-      "Minimum Rating": "minRating",
-      Actor: "actor",
-      Rated: "certification",
-      "Release Year": "releaseYear",
-      Language: "language",
-      "Sort By": "sortBy",
+      Genre: 'genre',
+      'Minimum Rating': 'minRating',
+      Actor: 'actor',
+      Rated: 'certification',
+      'Release Year': 'releaseYear',
+      Language: 'language',
+      'Sort By': 'sortBy',
     };
-    return map[title] || "";
+    return map[title] || '';
   };
-  
 
-  // ✅ Check if item is currently selected
   const isActive = (sectionTitle, itemUrl) => {
     const param = getParamKey(sectionTitle);
-    const value = new URL(itemUrl, "https://example.com").searchParams.get(param);
+    const value = new URL(itemUrl, 'https://example.com').searchParams.get(param);
     return searchParams.get(param) === value;
   };
 
@@ -77,44 +76,48 @@ export function NavMain({ items }) {
               </CollapsibleTrigger>
 
               <CollapsibleContent>
-                <SidebarMenuSub>
-                  {section.items?.map((item) => {
-                    const active = isActive(section.title, item.url);
+                {section.title === 'Release Year' ? (
+                  <YearFilterSection /> // ⬅️ специален компонент за години
+                ) : (
+                  <SidebarMenuSub>
+                    {section.items?.map((item) => {
+                      const active = isActive(section.title, item.url);
+                      const param = new URL(item.url, 'https://example.com')
+                        .searchParams.entries()
+                        .next().value;
+                      const [key, value] = param || [];
 
-                    const param = new URL(item.url, "https://example.com")
-                      .searchParams.entries()
-                      .next().value;
-                    const [key, value] = param || [];
+                      const updatedSearchParams = new URLSearchParams(searchParams.toString());
+                      if (active) {
+                        updatedSearchParams.delete(key);
+                      } else {
+                        updatedSearchParams.set(key, value);
+                      }
 
-                    const updatedSearchParams = new URLSearchParams(searchParams.toString());
+                      const newUrl = `${pathname}?${updatedSearchParams.toString()}`;
 
-                    if (active) {
-                      updatedSearchParams.delete(key); // 🔄 Toggle off
-                    } else {
-                      updatedSearchParams.set(key, value); // ✅ Add or update
-                    }
-
-                    const newUrl = `${pathname}?${updatedSearchParams.toString()}`;
-
-                    return (
-                      <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild>
-                          <a
-                            href={newUrl}
-                            className={`flex justify-between items-center w-full px-2 py-1 rounded-md ${
-                              active ? "bg-blue-100 font-semibold dark:bg-blue-900" : ""
-                            }`}
-                          >
-                            <span>{item.title}</span>
-                            {active && (
-                              <Check className="w-4 h-4 text-green-500 transition-opacity duration-200 opacity-100" />
-                            )}
-                          </a>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    );
-                  })}
-                </SidebarMenuSub>
+                      return (
+                        <SidebarMenuSubItem key={item.title}>
+                          <SidebarMenuSubButton asChild>
+                            <a
+                              href={newUrl}
+                              className={`flex justify-between items-center w-full px-2 py-1 rounded-md ${
+                                active
+                                  ? 'bg-blue-100 font-semibold dark:bg-blue-900'
+                                  : ''
+                              }`}
+                            >
+                              <span>{item.title}</span>
+                              {active && (
+                                <Check className="w-4 h-4 text-green-500 transition-opacity duration-200 opacity-100" />
+                              )}
+                            </a>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
+                  </SidebarMenuSub>
+                )}
               </CollapsibleContent>
             </SidebarMenuItem>
           </Collapsible>
