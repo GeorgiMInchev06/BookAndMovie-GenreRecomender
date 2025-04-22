@@ -42,7 +42,7 @@ export default function Favorites() {
   }
 
   return (
-    <div className="px-4 py-6">
+    <div className="px-4 py-0">
       {results.favs.length === 0 && results.favBooks.length === 0 && (
         <h1 className="text-center pt-6">No favorites yet</h1>
       )}

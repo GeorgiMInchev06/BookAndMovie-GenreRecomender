@@ -13,7 +13,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import SearchBox from "@/components/SearchBox";
 
 export default function Layout({ children }) {
   return (
@@ -25,9 +24,6 @@ export default function Layout({ children }) {
         >
           <div className="flex items-center gap-2 px-4 mr-auto">
             <SidebarTrigger className="-ml-1" />
-          </div>
-          <div className="flex ml-auto mr-6">
-            <SearchBox />
           </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 pt-6 sm:gap-6 sm:p-6">
