@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useSearchParams, usePathname } from 'next/navigation';
-import { ChevronRight, Check, XCircle } from 'lucide-react';
+import Link from "next/link";
+import { useSearchParams, usePathname } from "next/navigation";
+import { ChevronRight, Check, XCircle } from "lucide-react";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -18,9 +18,9 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from '@/components/ui/sidebar';
+} from "@/components/ui/sidebar";
 
-import YearFilterSection from '@/components/sidebar/yearFilterSection'; // ⬅️ Импортирай тук твоя нов компонент
+import YearFilterSection from "@/components/sidebar/yearFilterSection";
 
 export function NavMain({ items }) {
   const searchParams = useSearchParams();
@@ -28,21 +28,14 @@ export function NavMain({ items }) {
 
   const getParamKey = (title) => {
     const map = {
-      Genre: 'genre',
-      'Minimum Rating': 'minRating',
-      Actor: 'actor',
-      Rated: 'certification',
-      'Release Year': 'releaseYear',
-      Language: 'language',
-      'Sort By': 'sortBy',
+      Genre: "genre",
+      "Minimum Rating": "minRating",
+      Rated: "certification",
+      "Release Year": "releaseYear",
+      Language: "language",
+      "Sort By": "sortBy",
     };
-    return map[title] || '';
-  };
-
-  const isActive = (sectionTitle, itemUrl) => {
-    const param = getParamKey(sectionTitle);
-    const value = new URL(itemUrl, 'https://example.com').searchParams.get(param);
-    return searchParams.get(param) === value;
+    return map[title] || "";
   };
 
   return (
@@ -59,69 +52,91 @@ export function NavMain({ items }) {
       </SidebarGroupLabel>
 
       <SidebarMenu>
-        {items.map((section) => (
-          <Collapsible
-            key={section.title}
-            asChild
-            defaultOpen={section.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={section.title}>
-                  {section.icon && <section.icon />}
-                  <span>{section.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
+        {items.map((section) => {
+          const paramKey = getParamKey(section.title);
 
-              <CollapsibleContent>
-                {section.title === 'Release Year' ? (
-                  <YearFilterSection /> // ⬅️ специален компонент за години
-                ) : (
-                  <SidebarMenuSub>
-                    {section.items?.map((item) => {
-                      const active = isActive(section.title, item.url);
-                      const param = new URL(item.url, 'https://example.com')
-                        .searchParams.entries()
-                        .next().value;
-                      const [key, value] = param || [];
+          return (
+            <Collapsible
+              key={section.title}
+              asChild
+              defaultOpen={section.isActive}
+              className="group/collapsible"
+            >
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip={section.title}>
+                    {section.icon && <section.icon />}
+                    <span>{section.title}</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
 
-                      const updatedSearchParams = new URLSearchParams(searchParams.toString());
-                      if (active) {
-                        updatedSearchParams.delete(key);
-                      } else {
-                        updatedSearchParams.set(key, value);
-                      }
+                <CollapsibleContent>
+                  {section.title === "Release Year" ? (
+                    <YearFilterSection />
+                  ) : (
+                    <SidebarMenuSub>
+                      {section.items?.map((item) => {
+                        const urlParams = new URL(item.url, "https://example.com").searchParams;
+                        const value = urlParams.get(paramKey);
 
-                      const newUrl = `${pathname}?${updatedSearchParams.toString()}`;
+                        const currentParams = new URLSearchParams(searchParams.toString());
 
-                      return (
-                        <SidebarMenuSubItem key={item.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a
-                              href={newUrl}
-                              className={`flex justify-between items-center w-full px-2 py-1 rounded-md ${
-                                active
-                                  ? 'bg-blue-100 font-semibold dark:bg-blue-900'
-                                  : ''
-                              }`}
-                            >
-                              <span>{item.title}</span>
-                              {active && (
-                                <Check className="w-4 h-4 text-green-500 transition-opacity duration-200 opacity-100" />
-                              )}
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      );
-                    })}
-                  </SidebarMenuSub>
-                )}
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
+                        let currentValues = currentParams.get(paramKey)?.split(",") || [];
+
+                        const isGenreMultiSelect = paramKey === "genre";
+
+                        const isActive =
+                          isGenreMultiSelect && currentValues.includes(value)
+                            ? true
+                            : currentParams.get(paramKey) === value;
+
+                        if (isActive) {
+                          // премахваме от активните
+                          currentValues = currentValues.filter((v) => v !== value);
+                        } else {
+                          if (isGenreMultiSelect) {
+                            currentValues.push(value);
+                          } else {
+                            currentValues = [value];
+                          }
+                        }
+
+                        if (currentValues.length > 0) {
+                          currentParams.set(paramKey, currentValues.join(","));
+                        } else {
+                          currentParams.delete(paramKey);
+                        }
+
+                        const newUrl = `${pathname}?${currentParams.toString()}`;
+
+                        return (
+                          <SidebarMenuSubItem key={item.title}>
+                            <SidebarMenuSubButton asChild>
+                              <a
+                                href={newUrl}
+                                className={`flex justify-between items-center w-full px-2 py-1 rounded-md ${
+                                  isActive
+                                    ? "bg-blue-100 font-semibold dark:bg-blue-900"
+                                    : ""
+                                }`}
+                              >
+                                <span>{item.title}</span>
+                                {isActive && (
+                                  <Check className="w-4 h-4 text-green-500 transition-opacity duration-200 opacity-100" />
+                                )}
+                              </a>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
+                    </SidebarMenuSub>
+                  )}
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          );
+        })}
       </SidebarMenu>
     </SidebarGroup>
   );
