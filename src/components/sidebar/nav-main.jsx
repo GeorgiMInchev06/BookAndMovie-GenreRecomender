@@ -20,8 +20,6 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
-import YearFilterSection from "@/components/sidebar/yearFilterSection";
-
 export function NavMain({ items }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -32,6 +30,10 @@ export function NavMain({ items }) {
       "Minimum Rating": "minRating",
       Rated: "certification",
       "Release Year": "releaseYear",
+      Subject: "subject",
+      "Subject / Genre": "subject",
+      Author: "author",
+      Publisher: "publisher",
       Language: "language",
       "Sort By": "sortBy",
     };
@@ -53,13 +55,45 @@ export function NavMain({ items }) {
 
       <SidebarMenu>
         {items.map((section) => {
+          // 📦 Поддръжка за компоненти като <YearFilterSection />
+          if (section.component) {
+            return (
+              <Collapsible
+                key={section.title}
+                asChild
+                defaultOpen
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip={section.title}>
+                      {section.icon && <section.icon />}
+                      <span>{section.title}</span>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="px-3 py-2">{section.component}</div>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+            );
+          }
+
           const paramKey = getParamKey(section.title);
+          const currentParams = new URLSearchParams(searchParams.toString());
+          const currentValues = currentParams.get(paramKey)?.split(",") || [];
+
+          const sectionIsActive = section.items?.some((item) => {
+            const value = new URL(item.url, "https://example.com").searchParams.get(paramKey);
+            return currentValues.includes(value);
+          });
 
           return (
             <Collapsible
               key={section.title}
               asChild
-              defaultOpen={section.isActive}
+              defaultOpen={sectionIsActive}
               className="group/collapsible"
             >
               <SidebarMenuItem>
@@ -72,66 +106,56 @@ export function NavMain({ items }) {
                 </CollapsibleTrigger>
 
                 <CollapsibleContent>
-                  {section.title === "Release Year" ? (
-                    <YearFilterSection />
-                  ) : (
-                    <SidebarMenuSub>
-                      {section.items?.map((item) => {
-                        const urlParams = new URL(item.url, "https://example.com").searchParams;
-                        const value = urlParams.get(paramKey);
+                  <SidebarMenuSub>
+                    {section.items?.map((item) => {
+                      const urlParams = new URL(item.url, "https://example.com").searchParams;
+                      const value = urlParams.get(paramKey);
 
-                        const currentParams = new URLSearchParams(searchParams.toString());
+                      let newValues = [...currentValues];
+                      const isMulti = paramKey === "genre" || paramKey === "subject";
 
-                        let currentValues = currentParams.get(paramKey)?.split(",") || [];
+                      const isActive = newValues.includes(value);
 
-                        const isGenreMultiSelect = paramKey === "genre";
-
-                        const isActive =
-                          isGenreMultiSelect && currentValues.includes(value)
-                            ? true
-                            : currentParams.get(paramKey) === value;
-
-                        if (isActive) {
-                          // премахваме от активните
-                          currentValues = currentValues.filter((v) => v !== value);
+                      if (isActive) {
+                        newValues = newValues.filter((v) => v !== value);
+                      } else {
+                        if (isMulti) {
+                          newValues.push(value);
                         } else {
-                          if (isGenreMultiSelect) {
-                            currentValues.push(value);
-                          } else {
-                            currentValues = [value];
-                          }
+                          newValues = [value];
                         }
+                      }
 
-                        if (currentValues.length > 0) {
-                          currentParams.set(paramKey, currentValues.join(","));
-                        } else {
-                          currentParams.delete(paramKey);
-                        }
+                      const updatedParams = new URLSearchParams(currentParams.toString());
+                      if (newValues.length > 0) {
+                        updatedParams.set(paramKey, newValues.join(","));
+                      } else {
+                        updatedParams.delete(paramKey);
+                      }
 
-                        const newUrl = `${pathname}?${currentParams.toString()}`;
+                      const newUrl = `${pathname}?${updatedParams.toString()}`;
 
-                        return (
-                          <SidebarMenuSubItem key={item.title}>
-                            <SidebarMenuSubButton asChild>
-                              <a
-                                href={newUrl}
-                                className={`flex justify-between items-center w-full px-2 py-1 rounded-md ${
-                                  isActive
-                                    ? "bg-blue-100 font-semibold dark:bg-blue-900"
-                                    : ""
-                                }`}
-                              >
-                                <span>{item.title}</span>
-                                {isActive && (
-                                  <Check className="w-4 h-4 text-green-500 transition-opacity duration-200 opacity-100" />
-                                )}
-                              </a>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        );
-                      })}
-                    </SidebarMenuSub>
-                  )}
+                      return (
+                        <SidebarMenuSubItem key={item.title}>
+                          <SidebarMenuSubButton asChild>
+                            <a
+                              href={newUrl}
+                              className={`flex justify-between items-center w-full px-2 py-1 rounded-md ${
+                                isActive
+                                  ? "bg-blue-100 font-semibold dark:bg-blue-900"
+                                  : ""
+                              }`}
+                            >
+                              <span>{item.title}</span>
+                              {isActive && (
+                                <Check className="w-4 h-4 text-green-500 transition-opacity duration-200 opacity-100" />
+                              )}
+                            </a>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
+                  </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
